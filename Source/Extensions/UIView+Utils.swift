@@ -26,9 +26,9 @@ extension UILabel {
     
     var content: EKProperty.LabelContent {
         set {
-            text = newValue.text
-            accessibilityIdentifier = newValue.accessibilityIdentifier
             style = newValue.style
+            attributedText = newValue.text
+            accessibilityIdentifier = newValue.accessibilityIdentifier
         }
         get {
             return EKProperty.LabelContent(text: text ?? "", style: style)
@@ -39,7 +39,7 @@ extension UILabel {
 extension UIButton {
     var buttonContent: EKProperty.ButtonContent {
         set {
-            setTitle(newValue.label.text, for: .normal)
+            setAttributedTitle(newValue.label.text, for: .normal)
             setTitleColor(newValue.label.style.color(for: traitCollection), for: .normal)
             titleLabel?.font = newValue.label.style.font
             accessibilityIdentifier = newValue.accessibilityIdentifier
@@ -117,13 +117,17 @@ extension UITextField {
     
     var placeholder: EKProperty.LabelContent {
         set {
-            attributedPlaceholder = NSAttributedString(
-                string: newValue.text,
-                attributes: [
-                    .font: newValue.style.font,
-                    .foregroundColor: newValue.style.color(for: traitCollection)
-                ]
-            )
+            if newValue.text.attributes(at: 0, effectiveRange: nil).isEmpty {
+                attributedPlaceholder = NSAttributedString(
+                    string: newValue.text.string,
+                    attributes: [
+                        .font: newValue.style.font,
+                        .foregroundColor: newValue.style.color(for: traitCollection)
+                    ]
+                )
+            } else {
+                attributedPlaceholder = attributedText
+            }
         }
         get {
             fatalError("placeholder doesn't have a getter")

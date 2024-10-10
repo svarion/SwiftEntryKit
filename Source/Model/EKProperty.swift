@@ -70,7 +70,7 @@ public struct EKProperty {
     public struct LabelContent {
         
         /** The text */
-        public var text: String
+        public var text: NSAttributedString
         
         /** The label's style */
         public var style: LabelStyle
@@ -78,12 +78,20 @@ public struct EKProperty {
         /** The label's accessibility ideentifier */
         public var accessibilityIdentifier: String?
         
-        public init(text: String,
+        public init(text: NSAttributedString,
                     style: LabelStyle,
                     accessibilityIdentifier: String? = nil) {
             self.text = text
             self.style = style
             self.accessibilityIdentifier = accessibilityIdentifier
+        }
+        
+        public init(text: String,
+                    style: LabelStyle,
+                    accessibilityIdentifier: String? = nil) {
+            self.init(text: NSAttributedString(string: text),
+                      style: style,
+                      accessibilityIdentifier: accessibilityIdentifier)
         }
     }
     
@@ -395,5 +403,17 @@ public struct EKProperty {
             self.selectedImage = selectedImage
             self.size = size
         }
+    }
+}
+
+public extension NSAttributedString {
+    public func hasFontAttributes() -> Bool {
+        return self.attributes(at: 0, effectiveRange: nil).keys.contains(NSAttributedString.Key.font)
+    }
+    
+    public func hasColorAttributes() -> Bool {
+        let colorKeys: [NSAttributedString.Key] = [.foregroundColor, .backgroundColor, .underlineColor, .strokeColor, .strikethroughColor]
+        let attributeKeys = self.attributes(at: 0, effectiveRange: nil).keys
+        return !Set(attributeKeys).intersection(Set(colorKeys)).isEmpty
     }
 }
